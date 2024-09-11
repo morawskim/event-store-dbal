@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Broadway\EventStore\Dbal\Management;
 
 use Broadway\EventStore\Dbal\DBALEventStore;
+use Broadway\EventStore\Dbal\DbalForwardCompatHelper;
 use Broadway\EventStore\Management\Testing\EventStoreManagementTest;
 use Broadway\Serializer\SimpleInterfaceSerializer;
 use Broadway\UuidGenerator\Converter\BinaryUuidConverter;
@@ -24,8 +25,7 @@ class DBALEventStoreManagementTest extends EventStoreManagementTest
     public function createEventStore()
     {
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
-        $schemaManager = $connection->getSchemaManager();
-        $schema = $schemaManager->createSchema();
+        [$schemaManager, $schema] = DbalForwardCompatHelper::getSchemaManagerAndSchema($connection);
         $eventStore = new DBALEventStore(
             $connection,
             new SimpleInterfaceSerializer(),

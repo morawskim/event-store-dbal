@@ -82,7 +82,7 @@ class DBALEventStore implements EventStore, EventStoreManagement
         Serializer $metadataSerializer,
         string $tableName,
         bool $useBinary,
-        ?BinaryUuidConverterInterface $binaryUuidConverter = null
+        ?BinaryUuidConverterInterface $binaryUuidConverter = null,
     ) {
         $this->connection = $connection;
         $this->payloadSerializer = $payloadSerializer;
@@ -309,17 +309,17 @@ class DBALEventStore implements EventStore, EventStoreManagement
                 foreach ($criteria->getAggregateRootIds() as $id) {
                     $bindValues['uuids'][] = $this->convertIdentifierToStorageValue($id);
                 }
-                $bindValueTypes['uuids'] = Connection::PARAM_STR_ARRAY;
+                $bindValueTypes['uuids'] = DbalForwardCompatHelper::getParamStrArrayConst();
             } else {
                 $bindValues['uuids'] = $criteria->getAggregateRootIds();
-                $bindValueTypes['uuids'] = Connection::PARAM_STR_ARRAY;
+                $bindValueTypes['uuids'] = DbalForwardCompatHelper::getParamStrArrayConst();
             }
         }
 
         if ($criteria->getEventTypes()) {
             $criteriaTypes[] = 'type IN (:types)';
             $bindValues['types'] = $criteria->getEventTypes();
-            $bindValueTypes['types'] = Connection::PARAM_STR_ARRAY;
+            $bindValueTypes['types'] = DbalForwardCompatHelper::getParamStrArrayConst();
         }
 
         if (!$criteriaTypes) {
